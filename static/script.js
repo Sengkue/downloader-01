@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearIcon = document.getElementById('clear-icon');
     const videoUrlInput = document.getElementById('video-url');
 
+    if (!form || !progressContainer || !progressBar || !progressText) {
+        console.error('One or more elements could not be found in the DOM.');
+        return; // Exit early if elements are missing
+    }
+
     form.addEventListener('submit', function(event) {
         // Show the progress container when the download starts
         progressContainer.style.display = 'block';
