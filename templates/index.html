@@ -17,12 +17,39 @@
                     }
                 });
         }
+
+        function startDownload(event) {
+            event.preventDefault();
+            const url = document.getElementById('url').value;
+            const format = document.querySelector('select[name="format"]').value;
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `url=${encodeURIComponent(url)}&format=${encodeURIComponent(format)}`,
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'downloaded_file';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.getElementById('progress').innerText = 'Download Complete';
+            })
+            .catch(error => console.error('Error:', error));
+            checkProgress(url);
+        }
     </script>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Downloader</h1>
-        <form action="/download" method="post" onsubmit="checkProgress(document.getElementById('url').value)">
+        <form onsubmit="startDownload(event)">
             <input type="text" id="url" name="url" placeholder="Enter YouTube URL" required>
             <select name="format">
                 <option value="mp4">MP4</option>
