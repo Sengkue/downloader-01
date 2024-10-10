@@ -11,6 +11,7 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('progress').innerText = `Download Progress: ${data.progress}`;
+                    console.log(`Progress: ${data.progress}`);  // Debugging line
                     if (data.progress !== '100%') {
                         setTimeout(() => checkProgress(videoId), 1000);
                     }
