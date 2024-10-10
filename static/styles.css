@@ -114,3 +114,31 @@ h1 {
     margin-top: 15px;
     font-size: 14px;
 }
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#progress-container {
+    margin-top: 20px;
+    background-color: #f3f3f3;
+    border-radius: 25px;
+    height: 25px;
+    width: 100%;
+    position: relative;
+}
+
+#progress-bar {
+    background: linear-gradient(to right, #4caf50, #8bc34a);
+    height: 100%;
+    width: 0;
+    border-radius: 25px;
+}
+
+#progress-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 25px;
+}
