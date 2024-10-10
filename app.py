@@ -11,25 +11,35 @@ def index():
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form['url']
-    format_type = request.form['format']
-    
     try:
-        # Set options for yt-dlp based on format type
+        # Create a temporary directory to store downloads
+        download_dir = 'downloads'
+        if not os.path.exists(download_dir):
+            os.makedirs(download_dir)
+        
+        # Options to download both video and audio
         ydl_opts = {
-            'format': 'bestaudio' if format_type == 'audio' else 'best',
-            'outtmpl': 'downloads/%(title)s.%(ext)s',
+            'format': 'bestvideo+bestaudio/best',
+            'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
+            'postprocessors': [{
+                'key': 'FFmpegVideoConvertor',  # convert to mp4
+                'preferedformat': 'mp4',  # change as needed
+            }],
         }
         
+        # Download the video and audio
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # Extract video/audio information and download
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
 
-        # Send file to the user
+        # Send the file to the user
         response = send_file(filename, as_attachment=True)
 
-        # Delete the file after sending
-        os.remove(filename)
+        # Delete the file after sending it to the user
+        @response.call_on_close
+        def remove_file():
+            if os.path.exists(filename):
+                os.remove(filename)
 
         return response
 
@@ -37,7 +47,4 @@ def download():
         return str(e), 500
 
 if __name__ == '__main__':
-    # Create downloads directory if it doesn't exist
-    if not os.path.exists('downloads'):
-        os.makedirs('downloads')
     app.run(debug=True)
