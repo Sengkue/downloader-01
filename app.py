@@ -8,6 +8,7 @@ download_progress = {}
 def progress_hook(d):
     if d['status'] == 'downloading':
         download_progress[d['info_dict']['id']] = d['_percent_str']
+        print(f"Downloading: {d['_percent_str']}")  # Debugging line
 
 @app.route('/')
 def index():
