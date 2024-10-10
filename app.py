@@ -5,10 +5,6 @@ import shutil
 
 app = Flask(__name__)
 
-def progress_hook(d):
-    if d['status'] == 'downloading':
-        print(f"Downloading: {d['_percent_str']}")  # Debugging line
-
 def delete_all_files_in_folder(folder_path):
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
@@ -31,7 +27,6 @@ def download():
     ydl_opts = {
         'format': 'bestaudio/best' if format == 'mp3' else 'bestvideo+bestaudio',
         'outtmpl': f'downloads/%(title)s.%(ext)s',
-        'progress_hooks': [progress_hook],
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -51,10 +46,6 @@ def download():
         return response
 
     return send_file(file_path, as_attachment=True)
-
-@app.route('/progress/<video_id>', methods=['GET'])
-def progress(video_id):
-    return jsonify({'progress': download_progress.get(video_id, '0%')})
 
 if __name__ == '__main__':
     if not os.path.exists('downloads'):
