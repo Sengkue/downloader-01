@@ -3,56 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video/Audio Downloader</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>YouTube Video Downloader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>YouTube Video/Audio Downloader</h1>
-        <form id="download-form">
-            <label for="url">YouTube URL:</label>
-            <input type="text" id="url" name="url" placeholder="Enter YouTube URL" required>
-
-            <label for="type">Download type:</label>
-            <select id="type" name="type">
-                <option value="video">Video (MP4)</option>
-                <option value="audio">Audio (MP3)</option>
-            </select>
-
-            <button type="submit">Download</button>
+        <h1>YouTube Video Downloader</h1>
+        <form id="download-form" method="POST" action="/download">
+            <div class="input-group">
+                <input type="text" id="video-url" name="video_url" placeholder="Paste YouTube video URL here" required>
+                <button type="button" class="icon-button" id="paste-button">
+                    <i class="fas fa-paste"></i>
+                </button>
+                <button type="button" class="icon-button" id="clear-button" style="display:none;">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            <div class="format-group">
+                <label for="mp4">
+                    <input type="radio" id="mp4" name="format_choice" value="mp4" checked>
+                    MP4
+                </label>
+                <label for="mp3">
+                    <input type="radio" id="mp3" name="format_choice" value="mp3">
+                    MP3
+                </label>
+            </div>
+            <button type="submit" class="download-button">Download</button>
         </form>
-        <div id="status"></div>
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
     </div>
-
-    <script>
-        document.getElementById('download-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            let url = document.getElementById('url').value;
-            let type = document.getElementById('type').value;
-            let statusDiv = document.getElementById('status');
-
-            fetch('/download', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'url=' + encodeURIComponent(url) + '&type=' + encodeURIComponent(type)
-            })
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                const fileName = type === 'video' ? 'downloaded_video.mp4' : 'downloaded_audio.mp3';
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                statusDiv.innerHTML = `<p>Download started: ${fileName}</p>`;
-            })
-            .catch(error => {
-                statusDiv.innerHTML = `<p>Error: ${error}</p>`;
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
