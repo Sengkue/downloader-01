@@ -7,13 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>YouTube Downloader</title>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
         <form method="POST" action="/download">
-            <input type="text" name="video_url" placeholder="Enter YouTube Video URL" required>
+            <div class="input-container">
+                <input type="text" name="video_url" id="video-url" placeholder="Enter YouTube Video URL" required>
+                <button type="button" class="icon-button" id="paste-button" title="Paste URL"><i class="fas fa-paste"></i></button>
+            </div>
             <select name="format_choice" required>
                 <option value="mp4">MP4</option>
                 <option value="mp3">MP3</option>
@@ -26,5 +30,16 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        // JavaScript to handle pasting the URL
+        document.getElementById('paste-button').addEventListener('click', function() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('video-url').value = text;
+            }).catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+            });
+        });
+    </script>
 </body>
 </html>
