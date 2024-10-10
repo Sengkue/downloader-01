@@ -1,15 +1,26 @@
-// JavaScript to handle pasting the URL
-const pasteButton = document.getElementById('paste-button');
-const videoUrlInput = document.getElementById('video-url');
+// Save this file as /static/script.js
+function pasteLink() {
+    navigator.clipboard.readText().then(function(text) {
+        document.getElementById('video-url').value = text;
+        toggleClearIcon(); // Show clear icon after pasting
+    }).catch(function(err) {
+        console.error('Failed to read clipboard: ', err);
+    });
+}
 
-pasteButton.addEventListener('click', function() {
-    // Check if the clipboard API is supported
-    navigator.clipboard.readText()
-        .then(text => {
-            videoUrlInput.value = text;
-        })
-        .catch(err => {
-            console.error('Failed to read clipboard contents: ', err);
-            alert('Failed to paste from clipboard. Please try again.');
-        });
-});
+function clearInput() {
+    document.getElementById('video-url').value = ''; // Clear the input field
+    toggleClearIcon(); // Hide clear icon after clearing
+}
+
+function toggleClearIcon() {
+    const inputField = document.getElementById('video-url');
+    const clearIcon = document.querySelector('.clear-icon');
+
+    // Show clear icon if the input field has value
+    if (inputField.value) {
+        clearIcon.style.display = 'block';
+    } else {
+        clearIcon.style.display = 'none';
+    }
+}
