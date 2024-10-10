@@ -42,11 +42,10 @@ h1 {
 .input-container {
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 input[type="text"] {
-    width: calc(100% - 50px);
+    flex: 1; /* Make input field take up available space */
     padding: 12px 15px;
     border: 1px solid #ccc;
     border-radius: 8px 0 0 8px;
@@ -61,7 +60,6 @@ input[type="text"]:focus {
 
 /* Button Styles */
 button {
-    width: 100%;
     padding: 12px;
     background-color: #007BFF;
     color: white;
