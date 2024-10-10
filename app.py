@@ -1,74 +1,41 @@
-from flask import Flask, request, render_template, jsonify, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import yt_dlp
 import os
 
 app = Flask(__name__)
-download_progress = {"status": "", "progress": 0}  # Global variable to store progress
 
-# Progress hook to track download progress
-def progress_hook(d):
-    if d['status'] == 'downloading':
-        downloaded = d.get('downloaded_bytes', 0)
-        total = d.get('total_bytes', 0)
-        if total > 0:
-            progress_percent = int(downloaded / total * 100)
-            download_progress['status'] = 'downloading'
-            download_progress['progress'] = progress_percent
-        else:
-            download_progress['progress'] = 0
-
-    elif d['status'] == 'finished':
-        download_progress['status'] = 'finished'
-        download_progress['progress'] = 100
+# Folder to save the downloaded video
+DOWNLOAD_FOLDER = os.path.join(os.getcwd(), "downloads")
+if not os.path.exists(DOWNLOAD_FOLDER):
+    os.makedirs(DOWNLOAD_FOLDER)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/download', methods=['POST'])
-def download():
-    video_url = request.form.get('video_url')
-    format_choice = request.form.get('format_choice')
-
-    global download_progress
-    download_progress = {"status": "", "progress": 0}  # Reset progress
+def download_video():
+    url = request.form['url']
+    ydl_opts = {
+        'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
+        'format': 'best'
+    }
 
     try:
-        if not os.path.exists('downloads'):
-            os.makedirs('downloads')
-
-        ydl_opts = {
-            'outtmpl': 'downloads/%(title)s.%(ext)s',
-            'progress_hooks': [progress_hook],  # Add progress hook
-            'format': 'bestvideo+bestaudio' if format_choice == 'mp4' else 'bestaudio/best',
-        }
-
-        if format_choice == 'mp3':
-            ydl_opts['postprocessors'] = [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }]
-
-        # Download the video
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)
-            filename = ydl.prepare_filename(info_dict)
-
-            if format_choice == 'mp3':
-                mp3_filename = filename.rsplit('.', 1)[0] + '.mp3'
-                return send_file(mp3_filename, as_attachment=True)
-
-            return send_file(filename, as_attachment=True)
+            info_dict = ydl.extract_info(url, download=True)
+            video_title = info_dict.get('title', None)
+            video_file = ydl.prepare_filename(info_dict)
+        
+        return jsonify({"status": "success", "file": video_file, "title": video_title})
 
     except Exception as e:
-        return render_template('index.html', error=f"Error downloading the video: {str(e)}")
+        return jsonify({"status": "error", "message": str(e)})
 
-@app.route('/progress', methods=['GET'])
-def get_progress():
-    """Endpoint to return the current download progress"""
-    return jsonify(download_progress)
+@app.route('/download_file/<path:filename>', methods=['GET'])
+def download_file(filename):
+    file_path = os.path.join(DOWNLOAD_FOLDER, filename)
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
