@@ -1,6 +1,8 @@
-import os
+# Save this file as app.py
 from flask import Flask, request, render_template, send_file
 import yt_dlp
+import os
+import ffmpeg
 
 app = Flask(__name__)
 
@@ -52,6 +54,4 @@ def download():
         return render_template('index.html', error=f"Error downloading the video: {str(e)}")
 
 if __name__ == '__main__':
-    # Use the PORT environment variable for Render
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
