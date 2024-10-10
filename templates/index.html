@@ -43,15 +43,20 @@
         const videoUrlInput = document.getElementById('video-url');
 
         pasteButton.addEventListener('click', function() {
-            navigator.clipboard.readText()
-                .then(text => {
-                    videoUrlInput.value = text;
-                    clearButton.style.display = 'inline-block'; // Show clear button
-                })
-                .catch(err => {
-                    console.error('Failed to read clipboard contents: ', err);
-                    alert('Failed to paste from clipboard. Please try again.');
-                });
+            // Check if the clipboard API is supported
+            if (navigator.clipboard) {
+                navigator.clipboard.readText()
+                    .then(text => {
+                        videoUrlInput.value = text;
+                        clearButton.style.display = 'inline-block'; // Show clear button
+                    })
+                    .catch(err => {
+                        console.error('Failed to read clipboard contents: ', err);
+                        alert('Failed to paste from clipboard. Please try again.');
+                    });
+            } else {
+                alert('Clipboard API not supported. Please manually paste the URL.');
+            }
         });
 
         // Clear the input field
