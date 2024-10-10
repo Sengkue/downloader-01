@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Video Downloader</title>
     <link rel="stylesheet" href="static/styles.css">
-    <script defer src="static/script.js"></script> <!-- Use defer to load JS after HTML -->
+    <script defer src="static/script.js"></script> <!-- Use defer to ensure script runs after HTML is loaded -->
 </head>
 <body>
     <div class="container">
@@ -21,7 +21,7 @@
             <button type="submit">Download</button>
         </form>
         <div id="progress-container" style="display: none;">
-            <div id="progress-bar"></div>
+            <div id="progress-bar" style="width: 0%; background-color: green; height: 20px;"></div>
             <div id="progress-text">0%</div>
         </div>
         <div id="error"></div>
