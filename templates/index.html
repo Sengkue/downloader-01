@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video Downloader</title>
+    <title>YouTube Video/Audio Downloader</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>YouTube Video Downloader</h1>
+        <h1>YouTube Video/Audio Downloader</h1>
         <form id="download-form">
             <label for="url">YouTube URL:</label>
             <input type="text" id="url" name="url" placeholder="Enter YouTube URL" required>
+
+            <label for="type">Download type:</label>
+            <select id="type" name="type">
+                <option value="video">Video (MP4)</option>
+                <option value="audio">Audio (MP3)</option>
+            </select>
+
             <button type="submit">Download</button>
         </form>
         <div id="status"></div>
@@ -21,20 +28,26 @@
         document.getElementById('download-form').addEventListener('submit', function(event) {
             event.preventDefault();
             let url = document.getElementById('url').value;
+            let type = document.getElementById('type').value;
             let statusDiv = document.getElementById('status');
 
             fetch('/download', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'url=' + encodeURIComponent(url)
+                body: 'url=' + encodeURIComponent(url) + '&type=' + encodeURIComponent(type)
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    statusDiv.innerHTML = `<p>Download complete: <a href="/download_file/${encodeURIComponent(data.file.split("/").pop())}" download>${data.title}</a></p>`;
-                } else {
-                    statusDiv.innerHTML = `<p>Error: ${data.message}</p>`;
-                }
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                const fileName = type === 'video' ? 'downloaded_video.mp4' : 'downloaded_audio.mp3';
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                statusDiv.innerHTML = `<p>Download started: ${fileName}</p>`;
             })
             .catch(error => {
                 statusDiv.innerHTML = `<p>Error: ${error}</p>`;
