@@ -6,7 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearIcon = document.getElementById('clear-icon');
     const videoUrlInput = document.getElementById('video-url');
 
-    if (!form || !progressContainer || !progressBar || !progressText) {
+    // Log to see if elements are found
+    console.log('Form:', form);
+    console.log('Progress Container:', progressContainer);
+    console.log('Progress Bar:', progressBar);
+    console.log('Progress Text:', progressText);
+    console.log('Clear Icon:', clearIcon);
+    console.log('Video URL Input:', videoUrlInput);
+
+    if (!form || !progressContainer || !progressBar || !progressText || !clearIcon || !videoUrlInput) {
         console.error('One or more elements could not be found in the DOM.');
         return; // Exit early if elements are missing
     }
