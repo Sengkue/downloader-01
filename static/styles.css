@@ -1,95 +1,74 @@
 body {
+    background: linear-gradient(to right, #74ebd5, #9face6);
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f0f0f0, #c9d6ff);
     color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     margin: 0;
+    padding: 20px;
 }
 
 .container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
     background: white;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    text-align: center;
     margin-bottom: 20px;
 }
 
-.input-container {
-    position: relative;
-}
-
 input[type="text"] {
-    width: calc(100% - 60px);
+    width: calc(100% - 22px);
     padding: 10px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.icon-container {
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-}
-
-.icon-container i {
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 18px;
+    border-radius: 5px;
 }
 
 select {
-    width: 100%;
     padding: 10px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 10px;
+    border-radius: 5px;
 }
 
 button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
+    padding: 10px 15px;
+    background-color: #4caf50;
     color: white;
-    font-size: 16px;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
 }
 
 button:hover {
-    background-color: #0056b3;
-}
-
-#error {
-    color: red;
-    text-align: center;
-    margin-top: 10px;
+    background-color: #45a049;
 }
 
 #progress-container {
     margin-top: 20px;
+    background-color: #f3f3f3;
+    border-radius: 25px;
+    height: 25px;
+    width: 100%;
+    position: relative;
+    display: none; /* Initially hidden */
 }
 
 #progress-bar {
-    height: 20px;
-    background-color: #007bff;
-    width: 0%;
+    background: linear-gradient(to right, #4caf50, #8bc34a);
+    height: 100%;
+    width: 0;
+    border-radius: 25px;
     transition: width 0.5s;
-    border-radius: 4px;
 }
 
 #progress-text {
+    position: absolute;
+    width: 100%;
     text-align: center;
-    margin-top: 5px;
+    line-height: 25px;
 }
