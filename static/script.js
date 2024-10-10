@@ -1,26 +1,23 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const videoUrlInput = document.getElementById("video-url");
-    const pasteButton = document.getElementById("paste-button");
-    const clearButton = document.getElementById("clear-button");
+document.getElementById('downloadForm').addEventListener('submit', function(event) {
+    // Show the progress container when the download starts
+    document.getElementById('progress-container').style.display = 'block';
 
-    pasteButton.addEventListener("click", () => {
-        navigator.clipboard.readText()
-            .then(text => {
-                videoUrlInput.value = text;
-                clearButton.style.display = 'inline-block'; // Show clear button when text is pasted
-            })
-            .catch(err => {
-                console.error('Failed to read clipboard contents: ', err);
-            });
-    });
-
-    clearButton.addEventListener("click", () => {
-        videoUrlInput.value = '';
-        clearButton.style.display = 'none'; // Hide clear button when input is cleared
-    });
-
-    // Show/hide clear button based on input
-    videoUrlInput.addEventListener("input", () => {
-        clearButton.style.display = videoUrlInput.value ? 'inline-block' : 'none';
-    });
+    // Start polling for download progress
+    pollProgress();
 });
+
+function pollProgress() {
+    setInterval(() => {
+        fetch('/progress')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'downloading') {
+                    document.getElementById('progress-bar').style.width = data.progress + '%';
+                    document.getElementById('progress-text').innerText = data.progress + '%';
+                } else if (data.status === 'finished') {
+                    document.getElementById('progress-bar').style.width = '100%';
+                    document.getElementById('progress-text').innerText = '100% - Download complete!';
+                }
+            });
+    }, 1000);  // Poll every second
+}
