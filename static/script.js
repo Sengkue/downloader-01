@@ -1,23 +1,36 @@
-document.getElementById('downloadForm').addEventListener('submit', function(event) {
-    // Show the progress container when the download starts
-    document.getElementById('progress-container').style.display = 'block';
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadForm = document.getElementById('downloadForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
 
-    // Start polling for download progress
-    pollProgress();
+    if (downloadForm) {
+        downloadForm.onsubmit = function() {
+            loadingSpinner.style.display = 'block';
+            progressContainer.style.display = 'block';
+            const downloadButton = document.getElementById('downloadButton');
+            downloadButton.disabled = true; // Disable button to prevent multiple submissions
+
+            // Start the progress update loop
+            const updateProgress = setInterval(() => {
+                fetch('/progress')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.percent !== undefined) {
+                            const percent = data.percent.toFixed(2);
+                            progressBar.style.width = percent + '%';
+                            progressText.innerText = percent + '%';
+
+                            // Stop updating when download is complete
+                            if (percent >= 100) {
+                                clearInterval(updateProgress);
+                                loadingSpinner.style.display = 'none';
+                                downloadButton.disabled = false; // Re-enable the button
+                            }
+                        }
+                    });
+            }, 1000); // Update every second
+        };
+    }
 });
-
-function pollProgress() {
-    setInterval(() => {
-        fetch('/progress')
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'downloading') {
-                    document.getElementById('progress-bar').style.width = data.progress + '%';
-                    document.getElementById('progress-text').innerText = data.progress + '%';
-                } else if (data.status === 'finished') {
-                    document.getElementById('progress-bar').style.width = '100%';
-                    document.getElementById('progress-text').innerText = '100% - Download complete!';
-                }
-            });
-    }, 1000);  // Poll every second
-}
