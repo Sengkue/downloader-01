@@ -1,14 +1,19 @@
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, after_this_request
 import yt_dlp
 import os
+import threading
 
 app = Flask(__name__)
-download_progress = {}
 
 def progress_hook(d):
     if d['status'] == 'downloading':
-        download_progress[d['info_dict']['id']] = d['_percent_str']
         print(f"Downloading: {d['_percent_str']}")  # Debugging line
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+    except Exception as error:
+        print(f"Error removing file: {error}")
 
 @app.route('/')
 def index():
@@ -37,10 +42,7 @@ def download():
 
     @after_this_request
     def remove_file(response):
-        try:
-            os.remove(file_path)
-        except Exception as error:
-            print(f"Error removing file: {error}")
+        threading.Thread(target=delete_file, args=(file_path,)).start()
         return response
 
     return send_file(file_path, as_attachment=True)
