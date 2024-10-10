@@ -27,6 +27,7 @@ def download():
     ydl_opts = {
         'format': 'bestaudio/best' if format == 'mp3' else 'bestvideo+bestaudio',
         'outtmpl': f'downloads/%(title)s.%(ext)s',
+        'cookiefile': 'cookies.txt',  # Add this line to use cookies
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
