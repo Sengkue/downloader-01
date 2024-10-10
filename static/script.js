@@ -1,26 +1,26 @@
-// Save this file as /static/script.js
-function pasteLink() {
-    navigator.clipboard.readText().then(function(text) {
-        document.getElementById('video-url').value = text;
-        toggleClearIcon(); // Show clear icon after pasting
-    }).catch(function(err) {
-        console.error('Failed to read clipboard: ', err);
+document.addEventListener("DOMContentLoaded", function () {
+    const videoUrlInput = document.getElementById("video-url");
+    const pasteButton = document.getElementById("paste-button");
+    const clearButton = document.getElementById("clear-button");
+
+    pasteButton.addEventListener("click", () => {
+        navigator.clipboard.readText()
+            .then(text => {
+                videoUrlInput.value = text;
+                clearButton.style.display = 'inline-block'; // Show clear button when text is pasted
+            })
+            .catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+            });
     });
-}
 
-function clearInput() {
-    document.getElementById('video-url').value = ''; // Clear the input field
-    toggleClearIcon(); // Hide clear icon after clearing
-}
+    clearButton.addEventListener("click", () => {
+        videoUrlInput.value = '';
+        clearButton.style.display = 'none'; // Hide clear button when input is cleared
+    });
 
-function toggleClearIcon() {
-    const inputField = document.getElementById('video-url');
-    const clearIcon = document.querySelector('.clear-icon');
-
-    // Show clear icon if the input field has value
-    if (inputField.value) {
-        clearIcon.style.display = 'block';
-    } else {
-        clearIcon.style.display = 'none';
-    }
-}
+    // Show/hide clear button based on input
+    videoUrlInput.addEventListener("input", () => {
+        clearButton.style.display = videoUrlInput.value ? 'inline-block' : 'none';
+    });
+});
