@@ -1,15 +1,15 @@
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #f06, #ffb);
-    color: white;
+    color: #fff;
+    text-align: center;
 }
 
 .container {
     max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
+    margin: 50px auto;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
@@ -22,6 +22,17 @@ input, select, button {
     border: none;
 }
 
+button {
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
 #progress-container {
     margin-top: 20px;
     background-color: #f3f3f3;
@@ -29,6 +40,7 @@ input, select, button {
     height: 25px;
     width: 100%;
     position: relative;
+    display: none; /* Initially hidden */
 }
 
 #progress-bar {
@@ -44,4 +56,5 @@ input, select, button {
     width: 100%;
     text-align: center;
     line-height: 25px;
+    color: black; /* Make text visible on the progress bar */
 }
