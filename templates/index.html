@@ -16,7 +16,9 @@
         <form method="POST" action="/download">
             <div class="input-container">
                 <input type="text" name="video_url" id="video-url" placeholder="Enter YouTube Video URL" required>
-                <button type="button" class="icon-button" id="paste-button" title="Paste URL"><i class="fas fa-paste"></i></button>
+                <button type="button" class="icon-button" id="paste-button" title="Paste URL">
+                    <i class="fas fa-paste"></i>
+                </button>
             </div>
             <select name="format_choice" required>
                 <option value="mp4">MP4</option>
@@ -34,11 +36,14 @@
     <script>
         // JavaScript to handle pasting the URL
         document.getElementById('paste-button').addEventListener('click', function() {
-            navigator.clipboard.readText().then(text => {
-                document.getElementById('video-url').value = text;
-            }).catch(err => {
-                console.error('Failed to read clipboard contents: ', err);
-            });
+            navigator.clipboard.readText()
+                .then(text => {
+                    document.getElementById('video-url').value = text;
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                    alert('Failed to paste from clipboard. Please try again.');
+                });
         });
     </script>
 </body>
