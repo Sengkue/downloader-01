@@ -4,38 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Video Downloader</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>YouTube Video Downloader</h1>
-        <form id="download-form" method="POST" action="/download">
-            <div class="input-group">
-                <input type="text" id="video-url" name="video_url" placeholder="Paste YouTube video URL here" required>
-                <button type="button" class="icon-button" id="paste-button">
-                    <i class="fas fa-paste"></i>
-                </button>
-                <button type="button" class="icon-button" id="clear-button" style="display:none;">
-                    <i class="fas fa-times-circle"></i>
-                </button>
-            </div>
-            <div class="format-group">
-                <label for="mp4">
-                    <input type="radio" id="mp4" name="format_choice" value="mp4" checked>
-                    MP4
-                </label>
-                <label for="mp3">
-                    <input type="radio" id="mp3" name="format_choice" value="mp3">
-                    MP3
-                </label>
-            </div>
-            <button type="submit" class="download-button">Download</button>
-        </form>
-        {% if error %}
-            <div class="error-message">{{ error }}</div>
-        {% endif %}
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <h1>YouTube Video Downloader</h1>
+    <form action="/download" method="post">
+        <label for="url">YouTube Video URL:</label><br>
+        <input type="text" id="url" name="url" required><br><br>
+        <input type="submit" value="Download">
+    </form>
 </body>
 </html>
