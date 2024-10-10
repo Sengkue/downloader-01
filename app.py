@@ -8,6 +8,7 @@ app = Flask(__name__)
 download_progress = {}
 
 def progress_hook(d):
+    """Progress hook to update download progress."""
     if d['status'] == 'downloading':
         download_progress['percent'] = d['downloaded_bytes'] / d['total_bytes'] * 100
     elif d['status'] == 'finished':
@@ -41,6 +42,7 @@ def check():
 
             for f in formats:
                 if 'height' in f and str(f['height']) in desired_resolutions:
+                    # Only include formats that have a valid filesize
                     if f.get('filesize') is not None or f.get('filesize_approx') is not None:
                         format_info = {
                             'format_id': f['format_id'],
@@ -75,24 +77,26 @@ def download():
     if not url or not format_id:
         return "No URL or format ID provided", 400
 
+    # Set up yt-dlp options
     ydl_opts = {
         'format': format_id,
         'outtmpl': 'downloads/%(title)s.%(ext)s',
         'noplaylist': True,
         'progress_hooks': [progress_hook],
-        'retries': 5,
-        'socket_timeout': 30,
+        'retries': 5,  # Retry up to 5 times
+        'socket_timeout': 30,  # Timeout after 30 seconds
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # Attempt to download the selected format
             ydl.download([url])
             filename = ydl.prepare_filename(ydl.extract_info(url))
             return send_file(filename, as_attachment=True)
 
     except Exception as e:
         print(f"Error during download: {str(e)}")
-
+        
         # Attempt to fallback to the best available format
         fallback_ydl_opts = {
             'format': 'best',
@@ -120,4 +124,5 @@ def progress():
 if __name__ == '__main__':
     if not os.path.exists('downloads'):
         os.makedirs('downloads')
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

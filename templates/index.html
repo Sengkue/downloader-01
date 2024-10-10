@@ -3,82 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video Downloader</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>YouTube Video Downloader</title>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
-        <form id="downloadForm" method="POST" action="/check">
-            <input type="text" id="video-url" name="url" placeholder="Enter YouTube URL" required>
-            <button type="submit">Check Video</button>
+        <form id="videoForm" method="POST" action="/check">
+            <input type="text" name="url" placeholder="Enter YouTube video URL" required>
+            <button type="submit">Check Formats</button>
         </form>
-        <div id="format-selection" style="display: none;">
-            <h2>Select Format</h2>
-            <form id="downloadOptions" method="POST" action="/download">
-                <input type="hidden" name="url" id="videoUrl">
-                <div id="formats"></div>
-                <button type="submit">Download</button>
+
+        {% if formats %}
+        <div id="formatSelection">
+            <h2>Available Formats for {{ title }}:</h2>
+            <form action="/download" method="post" id="downloadForm">
+                <input type="hidden" name="url" value="{{ url }}">
+                <select name="format_id" required>
+                    <option value="">Select a format</option>
+                    {% for format in formats %}
+                    <option value="{{ format.format_id }}">{{ format.ext }} - {{ format.height }}p</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" id="downloadButton">Download</button>
             </form>
+
+            <div class="spinner" id="loadingSpinner"></div>
+            <div id="progressContainer">
+                <div id="progressBar"></div>
+                <div id="progressText">0%</div>
+            </div>
         </div>
-        <div id="progress" style="display: none;">
-            <h3>Download Progress</h3>
-            <div class="progress-bar" id="progress-bar"></div>
-            <span id="progress-percent">0%</span>
-        </div>
+        {% endif %}
     </div>
-    <script>
-        $(document).ready(function() {
-            $('#downloadForm').on('submit', function(event) {
-                event.preventDefault();
-                const url = $('#video-url').val();
-                $.post('/check', { url: url })
-                    .done(function(data) {
-                        $('#formats').empty();
-                        data.formats.forEach(function(format) {
-                            $('#formats').append(`
-                                <div>
-                                    <input type="radio" id="${format.format_id}" name="format_id" value="${format.format_id}">
-                                    <label for="${format.format_id}">${format.height} ${format.ext} (${format.filesize})</label>
-                                </div>
-                            `);
-                        });
-                        $('#videoUrl').val(url);
-                        $('#format-selection').show();
-                    })
-                    .fail(function() {
-                        alert("Error checking video. Please try again.");
-                    });
-            });
 
-            $('#downloadOptions').on('submit', function(event) {
-                event.preventDefault();
-                $('#progress').show();
-                $('#progress-bar').css('width', '0%');
-                $('#progress-percent').text('0%');
-                const url = $('#videoUrl').val();
-                $.post('/download', $(this).serialize())
-                    .done(function(data) {
-                        window.location.href = data; // Redirect to the download URL
-                    })
-                    .fail(function() {
-                        alert("Error downloading video.");
-                    });
-
-                // Poll for download progress
-                const intervalId = setInterval(function() {
-                    $.get('/progress')
-                        .done(function(data) {
-                            $('#progress-bar').css('width', data.percent + '%');
-                            $('#progress-percent').text(Math.round(data.percent) + '%');
-                            if (data.percent === 100) {
-                                clearInterval(intervalId);
-                            }
-                        });
-                }, 1000); // Poll every second
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
