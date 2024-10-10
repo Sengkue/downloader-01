@@ -3,29 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>YouTube Downloader</title>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
         <form id="downloadForm" method="POST" action="/download">
-            <input type="text" id="video-url" name="video_url" placeholder="Enter YouTube URL" required>
-            <select name="format_choice" id="format-choice">
+            <input type="text" name="video_url" placeholder="Paste YouTube link here" required>
+            <select name="format_choice">
                 <option value="mp4">MP4</option>
                 <option value="mp3">MP3</option>
             </select>
             <button type="submit">Download</button>
         </form>
-
-        <!-- Progress bar -->
         <div id="progress-container" style="display: none;">
             <div id="progress-bar"></div>
             <span id="progress-text">0%</span>
             <span id="eta-text">Estimated time: N/A</span>
         </div>
-
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <div id="error-message">{{ error }}</div>
     </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
