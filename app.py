@@ -1,13 +1,11 @@
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, after_this_request
 import yt_dlp
 import os
 
 app = Flask(__name__)
-download_progress = {}
 
 def progress_hook(d):
     if d['status'] == 'downloading':
-        download_progress[d['info_dict']['id']] = d['_percent_str']
         print(f"Downloading: {d['_percent_str']}")  # Debugging line
 
 @app.route('/')
@@ -35,11 +33,15 @@ def download():
         if format == 'mp3':
             file_path = file_path.replace('.webm', '.mp3').replace('.mp4', '.mp3')
 
-    return send_file(file_path, as_attachment=True)
+    @after_this_request
+    def remove_file(response):
+        try:
+            os.remove(file_path)
+        except Exception as error:
+            print(f"Error removing file: {error}")
+        return response
 
-@app.route('/progress/<video_id>', methods=['GET'])
-def progress(video_id):
-    return jsonify({'progress': download_progress.get(video_id, '0%')})
+    return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
     if not os.path.exists('downloads'):
