@@ -29,7 +29,7 @@ def index():
 def download():
     video_url = request.form.get('video_url')
     format_choice = request.form.get('format_choice')
-    
+
     global download_progress
     download_progress = {"status": "", "progress": 0}  # Reset progress
 
