@@ -1,13 +1,9 @@
 from flask import Flask, render_template, request, send_file, jsonify
 import yt_dlp
+import io
 import os
 
 app = Flask(__name__)
-
-# Folder to save the downloaded video
-DOWNLOAD_FOLDER = os.path.join(os.getcwd(), "downloads")
-if not os.path.exists(DOWNLOAD_FOLDER):
-    os.makedirs(DOWNLOAD_FOLDER)
 
 @app.route('/')
 def index():
@@ -16,26 +12,33 @@ def index():
 @app.route('/download', methods=['POST'])
 def download_video():
     url = request.form['url']
+    download_type = request.form.get('type', 'video')  # Default to video if no type is provided
+
     ydl_opts = {
-        'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
-        'format': 'best'
+        'format': 'best' if download_type == 'video' else 'bestaudio',
+        'outtmpl': '-',  # Output to stdout (streaming)
     }
 
     try:
+        # Use BytesIO to store the file in memory instead of on disk
+        buffer = io.BytesIO()
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=True)
-            video_title = info_dict.get('title', None)
-            video_file = ydl.prepare_filename(info_dict)
-        
-        return jsonify({"status": "success", "file": video_file, "title": video_title})
+            info_dict = ydl.extract_info(url, download=False)
+            video_title = info_dict.get('title', 'downloaded_video')
+            
+            # Download the video/audio and stream it to memory
+            ydl.download([url])
+            
+        buffer.seek(0)  # Rewind the buffer
+
+        # Send the file to the user without storing it permanently
+        if download_type == 'video':
+            return send_file(buffer, as_attachment=True, download_name=f"{video_title}.mp4", mimetype='video/mp4')
+        else:
+            return send_file(buffer, as_attachment=True, download_name=f"{video_title}.mp3", mimetype='audio/mp3')
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-
-@app.route('/download_file/<path:filename>', methods=['GET'])
-def download_file(filename):
-    file_path = os.path.join(DOWNLOAD_FOLDER, filename)
-    return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
