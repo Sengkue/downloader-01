@@ -118,16 +118,6 @@ h1 {
     max-width: 600px;
     margin: 0 auto;
     text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, #f06, #ffb);
-    border-radius: 10px;
-}
-
-input, select, button {
-    margin-top: 20px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
 }
 
 #progress-container {
@@ -144,7 +134,6 @@ input, select, button {
     height: 100%;
     width: 0;
     border-radius: 25px;
-    transition: width 0.5s ease-in-out;
 }
 
 #progress-text {
