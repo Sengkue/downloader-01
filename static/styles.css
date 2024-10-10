@@ -1,36 +1,39 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
     color: #fff;
     text-align: center;
+    padding: 50px;
 }
 
 .container {
     max-width: 600px;
-    margin: 50px auto;
+    margin: auto;
+    background: rgba(0, 0, 0, 0.7);
     padding: 20px;
-    background: rgba(0, 0, 0, 0.8);
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-input, select, button {
-    margin-top: 20px;
+input[type="text"], select {
+    width: 100%;
     padding: 10px;
-    font-size: 16px;
-    border-radius: 5px;
+    margin: 10px 0;
     border: none;
+    border-radius: 5px;
 }
 
 button {
-    background-color: #4caf50;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff5722;
     color: white;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background 0.3s;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #ff784e;
 }
 
 #progress-container {
@@ -51,15 +54,7 @@ button:hover {
     transition: width 0.5s ease-in-out;
 }
 
-#progress-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    line-height: 25px;
-    color: black; /* Make text visible on the progress bar */
-}
-
-#eta-text {
-    color: #ffcc00; /* Color for estimated time text */
-    font-weight: bold;
+#error-message {
+    color: red;
+    margin-top: 20px;
 }
