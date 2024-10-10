@@ -11,29 +11,15 @@ def index():
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form['url']
-    download_type = request.form['download_type']
-
+    download_type = request.form['download_type']  # Get the selected type of download
     try:
-        if download_type == 'video':
-            ydl_opts = {
-                'format': 'bestvideo+bestaudio/best',
-                'outtmpl': 'downloads/%(title)s.%(ext)s',
-            }
-        else:  # 'audio'
-            ydl_opts = {
-                'format': 'bestaudio',
-                'outtmpl': 'downloads/%(title)s.%(ext)s',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',  # or 'aac', 'wav', etc.
-                    'preferredquality': '192',
-                }],
-            }
-
+        ydl_opts = {
+            'format': 'bestvideo+bestaudio' if download_type == 'video' else 'bestaudio',
+            'outtmpl': f'downloads/%(title)s.%(ext)s',
+        }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
-
         return send_file(filename, as_attachment=True)
     except Exception as e:
         return str(e), 500
