@@ -14,21 +14,29 @@ def download_video():
     url = request.form['url']
     download_type = request.form.get('type', 'video')  # Default to video if no type is provided
 
+    # Prepare yt-dlp options for streaming output to memory
     ydl_opts = {
         'format': 'best' if download_type == 'video' else 'bestaudio',
-        'outtmpl': '-',  # Output to stdout (streaming)
+        'outtmpl': '-',  # Output to stdout (streaming to memory)
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }] if download_type == 'audio' else [],
+        'noplaylist': True  # Prevent downloading entire playlists
     }
 
     try:
         # Use BytesIO to store the file in memory instead of on disk
         buffer = io.BytesIO()
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # Extract video information without saving it to disk
             info_dict = ydl.extract_info(url, download=False)
             video_title = info_dict.get('title', 'downloaded_video')
-            
-            # Download the video/audio and stream it to memory
+
+            # Use yt-dlp to download the video/audio and stream to memory
             ydl.download([url])
-            
+
         buffer.seek(0)  # Rewind the buffer
 
         # Send the file to the user without storing it permanently
