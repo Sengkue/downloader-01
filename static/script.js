@@ -1,7 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('downloadForm').addEventListener('submit', function(event) {
+    const form = document.getElementById('downloadForm');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const clearIcon = document.getElementById('clear-icon');
+    const videoUrlInput = document.getElementById('video-url');
+
+    form.addEventListener('submit', function(event) {
         // Show the progress container when the download starts
-        document.getElementById('progress-container').style.display = 'block';
+        progressContainer.style.display = 'block';
+        progressText.innerText = '0%';
+        progressBar.style.width = '0%';
 
         // Prevent the default form submission
         event.preventDefault();
@@ -24,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
-            document.getElementById('progress-container').style.display = 'none'; // Hide progress after download
+            progressContainer.style.display = 'none'; // Hide progress after download
         }).catch(error => {
             console.error('There was an error!', error);
         });
@@ -39,14 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'downloading') {
-                        document.getElementById('progress-bar').style.width = data.progress + '%';
-                        document.getElementById('progress-text').innerText = data.progress + '%';
+                        progressBar.style.width = data.progress + '%';
+                        progressText.innerText = data.progress + '%';
                     } else if (data.status === 'finished') {
-                        document.getElementById('progress-bar').style.width = '100%';
-                        document.getElementById('progress-text').innerText = '100% - Download complete!';
+                        progressBar.style.width = '100%';
+                        progressText.innerText = '100% - Download complete!';
                         clearInterval(interval); // Stop polling
                     }
-                });
+                }).catch(error => console.error('Error fetching progress:', error));
         }, 1000);  // Poll every second
     }
+
+    window.pasteUrl = function() {
+        navigator.clipboard.readText().then(text => {
+            videoUrlInput.value = text;
+            clearIcon.style.display = 'inline'; // Show clear icon
+        });
+    };
+
+    window.clearUrl = function() {
+        videoUrlInput.value = '';
+        clearIcon.style.display = 'none'; // Hide clear icon
+    };
 });

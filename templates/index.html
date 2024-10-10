@@ -3,14 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
+    <title>YouTube Video Downloader</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
         <form id="downloadForm" method="POST" action="/download">
-            <input type="text" id="video-url" name="video_url" placeholder="Enter YouTube URL" required>
+            <div class="input-container">
+                <input type="text" id="video-url" name="video_url" placeholder="Enter YouTube URL" required>
+                <div class="icon-container">
+                    <i class="fa fa-paste" id="paste-icon" title="Paste" onclick="pasteUrl()"></i>
+                    <i class="fa fa-times" id="clear-icon" title="Clear" style="display: none;" onclick="clearUrl()"></i>
+                </div>
+            </div>
             <select name="format_choice" id="format-choice">
                 <option value="mp4">MP4</option>
                 <option value="mp3">MP3</option>
@@ -23,9 +29,13 @@
             <div id="progress-bar"></div>
             <span id="progress-text">0%</span>
         </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
     </div>
 
-    <!-- Include script at the end of the body -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
