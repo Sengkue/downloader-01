@@ -1,74 +1,123 @@
-from flask import Flask, request, render_template, jsonify, send_file
-import yt_dlp
+from flask import Flask, request, render_template, send_file, jsonify
 import os
+import yt_dlp
 
 app = Flask(__name__)
-download_progress = {"status": "", "progress": 0}  # Global variable to store progress
 
-# Progress hook to track download progress
+# Global variable to hold the download progress
+download_progress = {}
+
 def progress_hook(d):
     if d['status'] == 'downloading':
-        downloaded = d.get('downloaded_bytes', 0)
-        total = d.get('total_bytes', 0)
-        if total > 0:
-            progress_percent = int(downloaded / total * 100)
-            download_progress['status'] = 'downloading'
-            download_progress['progress'] = progress_percent
-        else:
-            download_progress['progress'] = 0
-
+        download_progress['percent'] = d['downloaded_bytes'] / d['total_bytes'] * 100
     elif d['status'] == 'finished':
-        download_progress['status'] = 'finished'
-        download_progress['progress'] = 100
+        download_progress['percent'] = 100
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/download', methods=['POST'])
-def download():
-    video_url = request.form.get('video_url')
-    format_choice = request.form.get('format_choice')
-    
-    global download_progress
-    download_progress = {"status": "", "progress": 0}  # Reset progress
+@app.route('/check', methods=['POST'])
+def check():
+    url = request.form.get('url')
+    if not url:
+        return "No URL provided", 400
+
+    ydl_opts = {
+        'format': 'best',
+        'noplaylist': True,
+        'quiet': True,
+    }
 
     try:
-        if not os.path.exists('downloads'):
-            os.makedirs('downloads')
-
-        ydl_opts = {
-            'outtmpl': 'downloads/%(title)s.%(ext)s',
-            'progress_hooks': [progress_hook],  # Add progress hook
-            'format': 'bestvideo+bestaudio' if format_choice == 'mp4' else 'bestaudio/best',
-        }
-
-        if format_choice == 'mp3':
-            ydl_opts['postprocessors'] = [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }]
-
-        # Download the video
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)
-            filename = ydl.prepare_filename(info_dict)
+            info_dict = ydl.extract_info(url, download=False)
+            title = info_dict.get('title', 'Unknown Title')
+            formats = info_dict.get('formats', [])
+            available_formats = []
 
-            if format_choice == 'mp3':
-                mp3_filename = filename.rsplit('.', 1)[0] + '.mp3'
-                return send_file(mp3_filename, as_attachment=True)
+            # Specify the desired resolutions
+            desired_resolutions = ['240', '360', '480', '720', '1080']
 
+            for f in formats:
+                if 'height' in f and str(f['height']) in desired_resolutions:
+                    if f.get('filesize') is not None or f.get('filesize_approx') is not None:
+                        format_info = {
+                            'format_id': f['format_id'],
+                            'height': f['height'],
+                            'width': f.get('width', 'N/A'),
+                            'filesize': f.get('filesize', f.get('filesize_approx', 'N/A')),
+                            'ext': f.get('ext', 'N/A'),
+                        }
+                        available_formats.append(format_info)
+
+            # Add MP3 format option
+            available_formats.append({
+                'format_id': 'bestaudio[ext=m4a]',
+                'height': 'Audio',
+                'width': 'N/A',
+                'filesize': 'N/A',
+                'ext': 'mp3',
+            })
+
+            return render_template('check.html', title=title, formats=available_formats, url=url)
+
+    except Exception as e:
+        return str(e), 500
+
+@app.route('/download', methods=['POST'])
+def download():
+    global download_progress
+    download_progress = {}  # Reset progress
+
+    url = request.form.get('url')
+    format_id = request.form.get('format_id')
+    if not url or not format_id:
+        return "No URL or format ID provided", 400
+
+    ydl_opts = {
+        'format': format_id,
+        'outtmpl': 'downloads/%(title)s.%(ext)s',
+        'noplaylist': True,
+        'progress_hooks': [progress_hook],
+        'retries': 5,
+        'socket_timeout': 30,
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+            filename = ydl.prepare_filename(ydl.extract_info(url))
             return send_file(filename, as_attachment=True)
 
     except Exception as e:
-        return render_template('index.html', error=f"Error downloading the video: {str(e)}")
+        print(f"Error during download: {str(e)}")
 
-@app.route('/progress', methods=['GET'])
-def get_progress():
-    """Endpoint to return the current download progress"""
+        # Attempt to fallback to the best available format
+        fallback_ydl_opts = {
+            'format': 'best',
+            'outtmpl': 'downloads/%(title)s.%(ext)s',
+            'noplaylist': True,
+            'progress_hooks': [progress_hook],
+            'retries': 5,
+            'socket_timeout': 30,
+        }
+
+        try:
+            with yt_dlp.YoutubeDL(fallback_ydl_opts) as ydl:
+                ydl.download([url])
+                filename = ydl.prepare_filename(ydl.extract_info(url))
+                return send_file(filename, as_attachment=True)
+
+        except Exception as fallback_error:
+            print(f"Fallback download error: {str(fallback_error)}")
+            return "An error occurred while downloading the video. Please try again later.", 500
+
+@app.route('/progress')
+def progress():
     return jsonify(download_progress)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    if not os.path.exists('downloads'):
+        os.makedirs('downloads')
+    app.run(debug=True)
