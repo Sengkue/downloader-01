@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, send_file, after_this_request
 import yt_dlp
 import os
-import threading
+import shutil
 
 app = Flask(__name__)
 
@@ -9,11 +9,16 @@ def progress_hook(d):
     if d['status'] == 'downloading':
         print(f"Downloading: {d['_percent_str']}")  # Debugging line
 
-def delete_file(file_path):
-    try:
-        os.remove(file_path)
-    except Exception as error:
-        print(f"Error removing file: {error}")
+def delete_all_files_in_folder(folder_path):
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
 
 @app.route('/')
 def index():
@@ -41,8 +46,8 @@ def download():
             file_path = file_path.replace('.webm', '.mp3').replace('.mp4', '.mp3')
 
     @after_this_request
-    def remove_file(response):
-        threading.Thread(target=delete_file, args=(file_path,)).start()
+    def remove_files(response):
+        delete_all_files_in_folder('downloads')
         return response
 
     return send_file(file_path, as_attachment=True)
