@@ -19,9 +19,6 @@
                 <button type="button" class="icon-button" id="paste-button" title="Paste URL">
                     <i class="fas fa-paste"></i>
                 </button>
-                <button type="button" class="icon-button" id="clear-button" title="Clear URL" style="display: none;">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             <select name="format_choice" required>
                 <option value="mp4">MP4</option>
@@ -39,7 +36,6 @@
     <script>
         // JavaScript to handle pasting the URL
         const pasteButton = document.getElementById('paste-button');
-        const clearButton = document.getElementById('clear-button');
         const videoUrlInput = document.getElementById('video-url');
 
         pasteButton.addEventListener('click', function() {
@@ -47,23 +43,11 @@
             navigator.clipboard.readText()
                 .then(text => {
                     videoUrlInput.value = text;
-                    clearButton.style.display = 'inline-block'; // Show clear button
                 })
                 .catch(err => {
                     console.error('Failed to read clipboard contents: ', err);
                     alert('Failed to paste from clipboard. Please try again.');
                 });
-        });
-
-        // Clear the input field
-        clearButton.addEventListener('click', function() {
-            videoUrlInput.value = '';
-            clearButton.style.display = 'none'; // Hide clear button
-        });
-
-        // Show clear button when there's text in the input
-        videoUrlInput.addEventListener('input', function() {
-            clearButton.style.display = videoUrlInput.value ? 'inline-block' : 'none';
         });
     </script>
 </body>
