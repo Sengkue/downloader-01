@@ -4,39 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>YouTube Video Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>YouTube Downloader</title>
 </head>
 <body>
     <div class="container">
         <h1>YouTube Video Downloader</h1>
-        <form id="videoForm" method="POST" action="/check">
-            <input type="text" name="url" placeholder="Enter YouTube video URL" required>
-            <button type="submit">Check Formats</button>
+        <form method="POST" action="/download">
+            <input type="text" name="video_url" placeholder="Enter YouTube Video URL" required>
+            <select name="format_choice" required>
+                <option value="mp4">MP4</option>
+                <option value="mp3">MP3</option>
+            </select>
+            <button type="submit">Download</button>
         </form>
-
-        {% if formats %}
-        <div id="formatSelection">
-            <h2>Available Formats for {{ title }}:</h2>
-            <form action="/download" method="post" id="downloadForm">
-                <input type="hidden" name="url" value="{{ url }}">
-                <select name="format_id" required>
-                    <option value="">Select a format</option>
-                    {% for format in formats %}
-                    <option value="{{ format.format_id }}">{{ format.ext }} - {{ format.height }}p</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" id="downloadButton">Download</button>
-            </form>
-
-            <div class="spinner" id="loadingSpinner"></div>
-            <div id="progressContainer">
-                <div id="progressBar"></div>
-                <div id="progressText">0%</div>
-            </div>
+        <div class="error">
+            {% if error %}
+                <p>{{ error }}</p>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
