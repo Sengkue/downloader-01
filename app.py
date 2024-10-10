@@ -1,4 +1,4 @@
-# Save this file as app.py
+# app.py
 from flask import Flask, request, render_template, send_file, jsonify
 import yt_dlp
 import os
@@ -31,15 +31,16 @@ def progress_hook(d):
 
 @app.route('/')
 def index():
-    return render_template('index.html', error=None)
+    return render_template('index.html')
 
 @app.route('/download', methods=['POST'])
 def download():
+    global download_progress
     video_url = request.form.get('video_url')
     format_choice = request.form.get('format_choice')
 
-    global download_progress
-    download_progress = {"status": "idle", "progress": 0, "eta": 0}  # Reset progress
+    # Reset progress
+    download_progress = {"status": "idle", "progress": 0, "eta": 0}
 
     try:
         if not os.path.exists('downloads'):
@@ -60,21 +61,20 @@ def download():
 
         # Download the video
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=True)
-            filename = ydl.prepare_filename(info_dict)
+            ydl.extract_info(video_url, download=True)
 
+            # Send the last downloaded file
+            filename = ydl.prepare_filename(ydl.extract_info(video_url, download=False))
             if format_choice == 'mp3':
-                mp3_filename = filename.rsplit('.', 1)[0] + '.mp3'
-                return send_file(mp3_filename, as_attachment=True)
-
+                filename = filename.rsplit('.', 1)[0] + '.mp3'
             return send_file(filename, as_attachment=True)
 
     except Exception as e:
         return render_template('index.html', error=f"Error downloading the video: {str(e)}")
 
-@app.route('/progress', methods=['GET'])
+@app.route('/progress')
 def progress():
     return jsonify(download_progress)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
