@@ -1,9 +1,7 @@
-version: 1
 services:
   - type: web
-    name: your-service-name
+    name: youtube-downloader
     env: python
-    buildCommand: |
-      sudo apt-get update && sudo apt-get install -y ffmpeg && pip install -r requirements.txt
-    startCommand: "python app.py"
-    autoDeploy: true
+    region: oregon
+    buildCommand: ""
+    startCommand: gunicorn app:app
