@@ -39,18 +39,23 @@ h1 {
 }
 
 /* Input Field Styles */
-input[type="text"], select {
-    width: 100%;
+.input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type="text"] {
+    width: calc(100% - 50px);
     padding: 12px 15px;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    border-radius: 8px 0 0 8px;
     font-size: 16px;
     outline: none;
     transition: border 0.3s ease;
 }
 
-input[type="text"]:focus, select:focus {
+input[type="text"]:focus {
     border: 1px solid #007BFF;
 }
 
@@ -65,11 +70,27 @@ button {
     font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-top: 15px; /* Add margin to separate from select */
 }
 
 button:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
+}
+
+/* Icon Button */
+.icon-button {
+    background: #007BFF;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    padding: 12px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.icon-button:hover {
+    background-color: #0056b3;
 }
 
 /* Error Message Styles */
@@ -90,7 +111,11 @@ button:hover {
         font-size: 16px;
     }
 
-    input[type="text"], select {
+    input[type="text"] {
         font-size: 14px;
+    }
+
+    .icon-button {
+        padding: 10px;
     }
 }
