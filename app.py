@@ -70,6 +70,5 @@ def get_progress():
     return jsonify(download_progress)
 
 if __name__ == '__main__':
-    # Automatically bind to the correct port for Render
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)  # No SSL context needed for Render
+    app.run(host='0.0.0.0', port=port)
