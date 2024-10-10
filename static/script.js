@@ -1,36 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const downloadForm = document.getElementById('downloadForm');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
+// JavaScript to handle pasting the URL
+const pasteButton = document.getElementById('paste-button');
+const videoUrlInput = document.getElementById('video-url');
 
-    if (downloadForm) {
-        downloadForm.onsubmit = function() {
-            loadingSpinner.style.display = 'block';
-            progressContainer.style.display = 'block';
-            const downloadButton = document.getElementById('downloadButton');
-            downloadButton.disabled = true; // Disable button to prevent multiple submissions
-
-            // Start the progress update loop
-            const updateProgress = setInterval(() => {
-                fetch('/progress')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.percent !== undefined) {
-                            const percent = data.percent.toFixed(2);
-                            progressBar.style.width = percent + '%';
-                            progressText.innerText = percent + '%';
-
-                            // Stop updating when download is complete
-                            if (percent >= 100) {
-                                clearInterval(updateProgress);
-                                loadingSpinner.style.display = 'none';
-                                downloadButton.disabled = false; // Re-enable the button
-                            }
-                        }
-                    });
-            }, 1000); // Update every second
-        };
-    }
+pasteButton.addEventListener('click', function() {
+    // Check if the clipboard API is supported
+    navigator.clipboard.readText()
+        .then(text => {
+            videoUrlInput.value = text;
+        })
+        .catch(err => {
+            console.error('Failed to read clipboard contents: ', err);
+            alert('Failed to paste from clipboard. Please try again.');
+        });
 });
