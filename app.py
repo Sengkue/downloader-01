@@ -1,49 +1,20 @@
-from flask import Flask, render_template, request, send_file, after_this_request
-import yt_dlp
-import os
-
-app = Flask(__name__)
-
-def progress_hook(d):
-    if d['status'] == 'downloading':
-        print(f"Downloading: {d['_percent_str']}")  # Debugging line
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/download', methods=['POST'])
-def download():
-    url = request.form['url']
-    format = request.form['format']
-    ydl_opts = {
-        'format': 'bestaudio/best' if format == 'mp3' else 'bestvideo+bestaudio',
-        'outtmpl': f'downloads/%(title)s.%(ext)s',
-        'progress_hooks': [progress_hook],
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }] if format == 'mp3' else []
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(url, download=True)
-        file_path = ydl.prepare_filename(info_dict)
-        if format == 'mp3':
-            file_path = file_path.replace('.webm', '.mp3').replace('.mp4', '.mp3')
-
-    @after_this_request
-    def remove_file(response):
-        try:
-            os.remove(file_path)
-        except Exception as error:
-            print(f"Error removing file: {error}")
-        return response
-
-    return send_file(file_path, as_attachment=True)
-
-if __name__ == '__main__':
-    if not os.path.exists('downloads'):
-        os.makedirs('downloads')
-    app.run(debug=True)
+[download] Destination: downloads\Tseg Ib Tug Neeg - LENG YANG「Official MV」.f251.webm 
+[download]   0.0% of    4.78MiB at  Unknown B/s ETA UnknownDownloading:   0.0%
+[download]   0.1% of    4.78MiB at  751.26KiB/s ETA 00:06Downloading:   0.1%
+[download]   0.1% of    4.78MiB at 1000.92KiB/s ETA 00:04Downloading:   0.1%
+[download]   0.3% of    4.78MiB at    1.63MiB/s ETA 00:02Downloading:   0.3%
+[download]   0.6% of    4.78MiB at    2.52MiB/s ETA 00:01Downloading:   0.6%
+[download]   1.3% of    4.78MiB at    4.10MiB/s ETA 00:01Downloading:   1.3%
+[download]   2.6% of    4.78MiB at    6.87MiB/s ETA 00:00Downloading:   2.6%
+[download]   5.2% of    4.78MiB at    8.89MiB/s ETA 00:00Downloading:   5.2%
+[download]  10.4% of    4.78MiB at    6.24MiB/s ETA 00:00Downloading:  10.4%
+[download]  20.9% of    4.78MiB at    5.69MiB/s ETA 00:00Downloading:  20.9%
+[download]  41.8% of    4.78MiB at    6.82MiB/s ETA 00:00Downloading:  41.8%
+[download]  83.7% of    4.78MiB at    8.48MiB/s ETA 00:00Downloading:  83.7%
+[download] 100.0% of    4.78MiB at    8.83MiB/s ETA 00:00Downloading: 100.0%
+[download] 100% of    4.78MiB in 00:00:00 at 6.48MiB/s
+[Merger] Merging formats into "downloads\Tseg Ib Tug Neeg - LENG YANG「Official MV」.webm" 
+Deleting original file downloads\Tseg Ib Tug Neeg - LENG YANG「Official MV」.f315.webm (pass -k to keep) 
+Deleting original file downloads\Tseg Ib Tug Neeg - LENG YANG「Official MV」.f251.webm (pass -k to keep) 
+Error removing file: [WinError 32] The process cannot access the file because it is being used by another process: 'downloads\\Tseg Ib Tug Neeg - LENG YANG「Official MV」.webm'
+127.0.0.1 - - [10/Oct/2024 20:53:32] "POST /download HTTP/1.1" 200 -
