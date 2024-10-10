@@ -11,11 +11,11 @@ def index():
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form['url']
-    download_type = request.form['download_type']  # Get the selected type of download
+    format_type = request.form['format']
     try:
         ydl_opts = {
-            'format': 'bestvideo+bestaudio' if download_type == 'video' else 'bestaudio',
-            'outtmpl': f'downloads/%(title)s.%(ext)s',
+            'format': 'bestaudio' if format_type == 'audio' else 'best',
+            'outtmpl': 'downloads/%(title)s.%(ext)s',
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)

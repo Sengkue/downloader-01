@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Video and Audio Downloader</title>
+    <title>YouTube Video & Audio Downloader</title>
 </head>
 <body>
-    <h1>YouTube Video and Audio Downloader</h1>
+    <h1>YouTube Video & Audio Downloader</h1>
     <form action="/download" method="post">
         <label for="url">YouTube Video URL:</label><br>
         <input type="text" id="url" name="url" required><br><br>
 
-        <label for="download_type">Select Download Type:</label><br>
-        <select id="download_type" name="download_type">
-            <option value="video">Video (Best Quality)</option>
-            <option value="audio">Audio (Best Quality)</option>
+        <label for="format">Select Format:</label><br>
+        <select id="format" name="format">
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
         </select><br><br>
 
         <input type="submit" value="Download">
