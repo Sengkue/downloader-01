@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #f06, #ffb);
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
     color: #fff;
     text-align: center;
 }
@@ -57,4 +57,9 @@ button:hover {
     text-align: center;
     line-height: 25px;
     color: black; /* Make text visible on the progress bar */
+}
+
+#eta-text {
+    color: #ffcc00; /* Color for estimated time text */
+    font-weight: bold;
 }
