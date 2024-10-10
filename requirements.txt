@@ -8,6 +8,4 @@ MarkupSafe==2.1.5
 mysql-connector-python==9.0.0
 Werkzeug==3.0.4
 gunicorn==20.1.0
-yt-dlp==2023.10.07  # Add yt-dlp to the list
-Flask==3.0.3
 yt-dlp==0.8.2
